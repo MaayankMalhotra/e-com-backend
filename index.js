@@ -43,7 +43,7 @@ server.post(
       response.status(400).send(`Webhook Error: ${err.message}`);
       return;
     }
-
+  
     // Handle the event
     switch (event.type) {
       case 'payment_intent.succeeded':
@@ -114,10 +114,10 @@ passport.use(
     done
   ) {
     // by default passport uses username
-    console.log({ email, password });
+    // console.log({ email, password });
     try {
       const user = await User.findOne({ email: email });
-      console.log(email, password, user);
+      // console.log(email, password, user);
       if (!user) {
         return done(null, false, { message: 'invalid credentials' }); // for safety
       }
@@ -135,6 +135,7 @@ passport.use(
             sanitizeUser(user),
             process.env.JWT_SECRET_KEY
           );
+          console.log("localstrategy");
           done(null, { id: user.id, role: user.role, token }); // this lines sends to serializer
         }
       );
@@ -148,7 +149,11 @@ passport.use(
   'jwt',
   new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
+      console.log(jwt_payload);
+      
       const user = await User.findById(jwt_payload.id);
+      // console.log("hello");
+     //  console.log(user);
       if (user) {
         return done(null, sanitizeUser(user)); // this calls serializer
       } else {
@@ -163,6 +168,7 @@ passport.use(
 // this creates session variable req.user on being called from callbacks
 passport.serializeUser(function (user, cb) {
   process.nextTick(function () {
+    // console.log("serializer");
     return cb(null, { id: user.id, role: user.role });
   });
 });
@@ -207,6 +213,6 @@ async function main() {
   console.log('database connected');
 }
 
-server.listen(process.env.PORT, () => {
-  console.log('server started');
+server.listen(8080, () => {
+  console.log('server started ');
 });
